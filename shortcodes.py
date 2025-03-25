@@ -133,46 +133,52 @@ Debes convertir cada actividad al formato de shortcode más apropiado según los
 
 ### 4. fill-in-the-blanks
 - Usar para: Textos con espacios para rellenar (texto libre)
-- Formato: [fill-in-the-blanks text="Texto con [text|respuesta] para completar."][/fill-in-the-blanks]
-- Ejemplo: [fill-in-the-blanks text="La capital de [text|España] es Madrid."][/fill-in-the-blanks]
+- Formato: [fill-in-the-blanks text="Texto con [text|respuesta] para completar." casesensitive="false" specialcharssensitive="false"][/fill-in-the-blanks]
+- Ejemplo: [fill-in-the-blanks text="La capital de [text|España] es Madrid." casesensitive="false" specialcharssensitive="false"][/fill-in-the-blanks]
 
 ### 5. fill-in-the-blanks
+- Usar para: Elegir entre dos opciones
+- Formato: [fill-in-the-blanks text="Texto: [radio|Verdadero#Falso*]" casesensitive="false" specialcharssensitive="false"][/fill-in-the-blanks]
+- Ejemplo: [fill-in-the-blanks text="La leche es: [radio|Blanca*#Negra]" casesensitive="false" specialcharssensitive="false"][/fill-in-the-blanks]
+- MUY IMPORTANTE: El asterisco (*) indica la opción correcta. El símbolo | separa las opciones.
+
+### 6. fill-in-the-blanks
 - Usar para: Textos con espacios para seleccionar entre opciones (menú desplegable)
-- Formato: [fill-in-the-blanks text="Texto con [select|Incorrecta1#*Correcta#Incorrecta2] para seleccionar."][/fill-in-the-blanks]
-- Ejemplo: [fill-in-the-blanks text="El animal más rápido es el [select|leopardo#*guepardo#león#tigre]."][/fill-in-the-blanks]
+- Formato: [fill-in-the-blanks text="Texto con [select|Incorrecta1#*Correcta#Incorrecta2] para seleccionar." casesensitive="false" specialcharssensitive="false"][/fill-in-the-blanks]
+- Ejemplo: [fill-in-the-blanks text="El animal más rápido es el [select|leopardo#*guepardo#león#tigre]." casesensitive="false" specialcharssensitive="false"][/fill-in-the-blanks]
 - MUY IMPORTANTE: El asterisco (*) indica la opción correcta. Debe haber solo una opción correcta por cada hueco. El símbolo # separa las opciones.
 
-### 6. statement-option-match
+### 7. statement-option-match
 - Usar para: Emparejar conceptos o frases con sus correspondientes opciones
 - Formato: [statement-option-match statements="a*afirmación1|b*afirmación2" options="a*título1*descripción1|b*título2*descripción2"][/statement-option-match]
 - Ejemplo: [statement-option-match statements="a*Lorem ipsum|b*Ipsum lorem|c*Dolor sit" options="a*Persona 1*Lorem ipsum Lorem ipsum|b*Persona 2*Lorem ipsum Lorem ipsum|c*Persona 3*Lorem ipsum Lorem ipsum"][/statement-option-match]
 
-### 7. writing
+### 8. writing
 - Usar para: Producción libre de texto escrito
 - Formato: [writing maxtime="0"][/writing]
 - Ejemplo: [writing maxtime="0"][/writing]
 
-### 8. oral-expression
+### 9. oral-expression
 - Usar para: Producción oral de respuestas
 - Formato: [oral-expression autoplay="false" maxtime="0" maxplays="0"][/oral-expression]
 - Ejemplo: [oral-expression autoplay="false" maxtime="0" maxplays="0"][/oral-expression]
 
-### 9. file-upload
+### 10. file-upload
 - Usar para: Subir archivos como respuesta
 - Formato: [file-upload extensions="pdf|doc|docx"][/file-upload]
 - Ejemplo: [file-upload extensions="pdf|doc|docx"][/file-upload]
 
-### 10. image-choice
+### 11. image-choice
 - Usar para: Preguntas con opciones de selección de imágenes
 - Formato: [image-choice images="url_imagen1*texto_alternativo1|url_imagen2*texto_alternativo2" correctOptionIndex="índice_opción_correcta"][/image-choice]
 - Ejemplo: [image-choice images="https://url-a-imagen-de-gato.com/gato.jpg*texto alternativo gato|https://url-a-imagen-de-perro.com/perro.jpg*texto alternativo perro" correctOptionIndex="1"][/image-choice]
 
-### 11. multi-question
+### 12. multi-question
 - Usar para: Agrupar varias preguntas en un solo bloque
 - Formato: [multi-question questions=""][/multi-question]
 - Ejemplo: [multi-question questions=""][/multi-question]
 
-### 12. abnone-choice
+### 13. abnone-choice
 - Usar para: Preguntas con opciones A, B, Ninguna de las anteriores
 - Formato: [abnone-choice titlea="Título A" texta="Texto A" titleb="Título B" textb="Texto B" questions="a*Pregunta A|b*Pregunta B|c*Pregunta C"][/abnone-choice]
 - Ejemplo: [abnone-choice titlea="Lorem" texta="Lorem ipsum Lorem ipsum" titleb="Ipsum" textb="Lorem" questions="a*¿Lorem ipsum?|b*¿Ipsum lorem?|c*¿Dolor sit?"]
@@ -184,6 +190,8 @@ Debes convertir cada actividad al formato de shortcode más apropiado según los
 3. Respeta el formato exacto de las comillas y corchetes
 4. Si un ejercicio no encaja exactamente en un tipo, elige el más cercano y adáptalo
 5. Si un ejercicio tiene múltiples partes que requieren diferentes tipos, trátalas como actividades separadas
+6. Si un ejercicio tiene múltiples partes intenta que vaya en un ÚNICO shortcode
+7. Los shortcodes tipo fill-the-blanks pueden usarse para varias actividades distintas
 
 ## Formato de tu respuesta
 
