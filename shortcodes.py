@@ -862,12 +862,24 @@ with col1:
             "O introduce el texto directamente aquí",
             value=st.session_state.current_text_content,
             height=300,
-            help="Pega el texto de los ejercicios o edita el contenido del archivo subido"
+            help="Pega el texto de los ejercicios o edita el contenido del archivo subido",
+            key="text_input_area"
         )
         
-        # Actualizar el texto en la sesión si cambió
+        # Función para actualizar el texto cuando cambia
+        def update_text():
+            st.session_state.current_text_content = st.session_state.text_input_area
+        
+        # Actualizar el texto en la sesión cuando cambia
         if text_content != st.session_state.current_text_content:
             st.session_state.current_text_content = text_content
+            
+        # Botón dedicado para guardar cambios en el texto
+        if st.button("Guardar cambios en el texto"):
+            st.session_state.current_text_content = text_content
+            st.success("Texto guardado correctamente.")
+            time.sleep(1)
+            st.rerun()
     
     # Campo para prompt personalizado (común para ambos tipos)
     st.header("Instrucciones personalizadas (opcional)")
@@ -1122,7 +1134,7 @@ with col2:
             with st.expander("Vista previa del archivo de descarga"):
                 st.text(texto_descargable)
     else:
-        st.info("Procesa una imagen o un fichero de texto para ver los resultados.")
+        st.info("Procesa una imagen o un texto para ver los resultados.")
 
 # Footer
 st.markdown("---")
