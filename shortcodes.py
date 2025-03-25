@@ -95,6 +95,9 @@ if 'prompt_personalizado' not in st.session_state:
     st.session_state.prompt_personalizado = ""
 if 'input_type' not in st.session_state:
     st.session_state.input_type = "image_url"  # "image_url" o "text_upload"
+# Inicializar resultado si no existe
+if 'resultado' not in st.session_state:
+    st.session_state.resultado = None
 
 # Esta sección contenía funciones para procesar PDFs que han sido eliminadas
 
@@ -512,8 +515,6 @@ El shortcode debe seguir alguno de estos formatos:
 - single-choice: [single-choice options="opción1|opción2|opción3" correctOption="opciónCorrecta"][/single-choice]
 - fill-in-the-blanks: [fill-in-the-blanks text="Texto con [text|respuesta] para completar."][/fill-in-the-blanks]
 - fill-in-the-blanks: [fill-in-the-blanks text="Texto con [select|Incorrecta1#*Correcta#Incorrecta2] para seleccionar."][/fill-in-the-blanks]
-– fill-in-the-blanks: [fill-in-the-blanks text="Texto [short-text|letra1][short-text|letra2][short-text|letra3]" casesensitive="false" specialcharssensitive="false"][/fill-in-the-blanks]
-– fill-in-the-blanks: [fill-in-the-blanks text="Texto: [radio|Verdadero#Falso*]" casesensitive="false" specialcharssensitive="false"][/fill-in-the-blanks]
 - statement-option-match: [statement-option-match statements="a*afirmación1|b*afirmación2" options="a*título1*descripción1|b*título2*descripción2"][/statement-option-match]
 - writing: [writing maxtime="0"][/writing]
 - oral-expression: [oral-expression autoplay="false" maxtime="0" maxplays="0"][/oral-expression]
@@ -688,6 +689,10 @@ def agregar_a_historial(evento, detalles=None):
 
 # Función para guardar una nueva versión de un shortcode
 def guardar_version_shortcode(actividad_num, shortcode, explicacion=None):
+    # Asegurarse de que shortcode_versions existe en la sesión
+    if 'shortcode_versions' not in st.session_state:
+        st.session_state.shortcode_versions = {}
+    
     actividad_key = f"actividad_{actividad_num}"
     
     if actividad_key not in st.session_state.shortcode_versions:
@@ -939,6 +944,10 @@ with col1:
                 info_estructurada = extraer_informacion_texto(texto_respuesta)
                 st.session_state.resultado = info_estructurada
                 
+                # Asegurarse de que shortcode_versions existe
+                if 'shortcode_versions' not in st.session_state:
+                    st.session_state.shortcode_versions = {}
+                
                 # Guardar la versión inicial de cada shortcode
                 for actividad in info_estructurada.get("actividades", []):
                     guardar_version_shortcode(
@@ -962,7 +971,7 @@ with col2:
         with st.expander("Respuesta completa de Claude"):
             st.markdown(st.session_state.texto_respuesta)
     
-    if 'resultado' in st.session_state:
+    if 'resultado' in st.session_state and st.session_state.resultado:
         resultado = st.session_state.resultado
         
         # Mostrar enunciado en una caja tipo markdown similar a la de los shortcodes
@@ -988,6 +997,11 @@ with col2:
                 
                 # Obtener la versión más reciente del shortcode si existe
                 shortcode_actual = actividad.get("shortcode", "")
+                
+                # Asegurarse de que shortcode_versions existe
+                if 'shortcode_versions' not in st.session_state:
+                    st.session_state.shortcode_versions = {}
+                
                 if actividad_key in st.session_state.shortcode_versions and st.session_state.shortcode_versions[actividad_key]:
                     versiones = st.session_state.shortcode_versions[actividad_key]
                     if versiones:
@@ -1059,7 +1073,7 @@ with col2:
             
             shortcode = actividad.get("shortcode", "")
             # Usar la versión más reciente si existe
-            if actividad_key in st.session_state.shortcode_versions and st.session_state.shortcode_versions[actividad_key]:
+            if 'shortcode_versions' in st.session_state and actividad_key in st.session_state.shortcode_versions and st.session_state.shortcode_versions[actividad_key]:
                 versiones = st.session_state.shortcode_versions[actividad_key]
                 if versiones:
                     shortcode = versiones[-1]["shortcode"]
