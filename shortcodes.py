@@ -86,6 +86,8 @@ if 'current_image_url' not in st.session_state:
     st.session_state.current_image_url = None
 if 'current_text_content' not in st.session_state:
     st.session_state.current_text_content = ""
+if 'temp_text_content' not in st.session_state:
+    st.session_state.temp_text_content = ""
 if 'api_key_saved' not in st.session_state:
     st.session_state.api_key_saved = ""
 if 'session_id' not in st.session_state:
@@ -857,28 +859,30 @@ with col1:
                     f"Nombre: {uploaded_text_file.name}\nTamaño: {len(text_contents)} caracteres"
                 )
         
-        # Área de texto para editar o pegar directamente
-        text_content = st.text_area(
-            "O introduce el texto directamente aquí",
-            value=st.session_state.current_text_content,
-            height=300,
-            help="Pega el texto de los ejercicios o edita el contenido del archivo subido",
-            key="text_input_area"
-        )
-        
-        # Función para actualizar el texto cuando cambia
-        def update_text():
+        # Inicializar la clave temporal si no existe
+        if 'temp_text_content' not in st.session_state:
+            st.session_state.temp_text_content = st.session_state.current_text_content
+            
+        # Callback para cuando cambia el texto
+        def on_text_change():
+            st.session_state.temp_text_content = st.session_state.text_input_area
             st.session_state.current_text_content = st.session_state.text_input_area
         
-        # Actualizar el texto en la sesión cuando cambia
-        if text_content != st.session_state.current_text_content:
-            st.session_state.current_text_content = text_content
-            
-        # Botón dedicado para guardar cambios en el texto
-        if st.button("Guardar cambios en el texto"):
-            st.session_state.current_text_content = text_content
-            st.success("Texto guardado correctamente.")
-            time.sleep(1)
+        # Área de texto para editar o pegar directamente
+        st.text_area(
+            "O introduce el texto directamente aquí",
+            value=st.session_state.temp_text_content,
+            height=300,
+            help="Pega el texto de los ejercicios o edita el contenido del archivo subido",
+            key="text_input_area",
+            on_change=on_text_change
+        )
+        
+        # Botón dedicado para actualizar explícitamente el texto
+        if st.button("Actualizar texto", key="update_text_btn"):
+            st.session_state.current_text_content = st.session_state.temp_text_content
+            st.success("Texto actualizado correctamente.")
+            time.sleep(0.5)
             st.rerun()
     
     # Campo para prompt personalizado (común para ambos tipos)
@@ -900,7 +904,7 @@ with col1:
             st.error("Por favor, ingresa tu clave API de Anthropic en la barra lateral.")
         elif st.session_state.input_type == "image_url" and not url_imagen:
             st.error("Por favor, proporciona una URL de imagen válida.")
-        elif st.session_state.input_type == "text_upload" and not st.session_state.current_text_content.strip():
+        elif st.session_state.input_type == "text_upload" and (not st.session_state.current_text_content.strip() and not st.session_state.temp_text_content.strip()):
             st.error("Por favor, introduce o sube un texto para procesar.")
         else:
             # Limpiar variables específicas para un nuevo procesamiento
@@ -936,14 +940,19 @@ with col1:
                         
                         agregar_a_historial(evento, detalles)
             
-            else:  # text_upload
+            elif st.session_state.input_type == "text_upload":
                 # Procesar el texto directamente
                 with st.spinner("Analizando el texto..."):
-                    texto_respuesta = analizar_texto_con_prompt(api_key, st.session_state.current_text_content, prompt_personalizado)
+                    # Asegurarse de usar el texto más actualizado
+                    texto_a_procesar = st.session_state.temp_text_content
+                    if not texto_a_procesar.strip():
+                        texto_a_procesar = st.session_state.current_text_content
+                    
+                    texto_respuesta = analizar_texto_con_prompt(api_key, texto_a_procesar, prompt_personalizado)
                     
                     if texto_respuesta:
                         evento = "Texto procesado"
-                        detalles = f"Longitud: {len(st.session_state.current_text_content)} caracteres"
+                        detalles = f"Longitud: {len(texto_a_procesar)} caracteres"
                         if prompt_personalizado:
                             detalles += f"\nPrompt personalizado: {prompt_personalizado}"
                         
