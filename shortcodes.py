@@ -84,6 +84,8 @@ if 'shortcode_versions' not in st.session_state:
     st.session_state.shortcode_versions = {}
 if 'current_image_url' not in st.session_state:
     st.session_state.current_image_url = None
+if 'current_text_content' not in st.session_state:
+    st.session_state.current_text_content = ""
 if 'api_key_saved' not in st.session_state:
     st.session_state.api_key_saved = ""
 if 'session_id' not in st.session_state:
@@ -91,6 +93,198 @@ if 'session_id' not in st.session_state:
     st.session_state.session_id = str(int(time.time()))
 if 'prompt_personalizado' not in st.session_state:
     st.session_state.prompt_personalizado = ""
+if 'input_type' not in st.session_state:
+    st.session_state.input_type = "image_url"  # "image_url" o "text_upload"
+
+# Esta sección contenía funciones para procesar PDFs que han sido eliminadas
+
+# Función para analizar texto con prompt adaptado
+def analizar_texto_con_prompt(api_key, texto, prompt_personalizado=""):
+    url = "https://api.anthropic.com/v1/messages"
+    
+    # Usar exactamente los encabezados que funcionaron
+    headers = {
+        "x-api-key": api_key.strip(),  # Eliminar espacios al inicio/final
+        "anthropic-version": "2023-06-01",
+        "content-type": "application/json"
+    }
+    
+    # Prompt base detallado para Claude
+    instrucciones_base = """
+# Tarea: Extraer ejercicios educativos y convertirlos en shortcodes
+
+Analiza detalladamente este texto de ejercicios educativos y extrae:
+
+1. El enunciado principal que explica el objetivo general de los ejercicios
+2. Cada actividad o pregunta individual presente en el texto
+
+"""
+
+    # Combinar prompt base con el prompt personalizado si existe
+    if prompt_personalizado and prompt_personalizado.strip():
+        instrucciones_completas = instrucciones_base + "\n\n## Instrucciones personalizadas adicionales\n\n" + prompt_personalizado
+    else:
+        instrucciones_completas = instrucciones_base
+    
+    # Añadir el texto de instrucciones sobre shortcodes y formato
+    instrucciones_completas += """
+## Tipos de shortcodes disponibles
+
+Debes convertir cada actividad al formato de shortcode más apropiado según los siguientes tipos:
+
+### 1. drag-words
+- Usar para: Ejercicios donde hay que completar frases arrastrando palabras a huecos
+- Formato: [drag-words words="palabra1|palabra2|palabra3" sentence="Texto con [] para rellenar" markers="palabra_correcta1|palabra_correcta2"][/drag-words]
+- Ejemplo: [drag-words words="gato|perro|elefante|mono|rata" sentence="El [] es más grande que el [], pero el [] es el más [] pequeño." markers="elefante|perro|gato|mono"][/drag-words]
+
+### 2. multiple-choice
+- Usar para: Preguntas con MÚLTIPLES respuestas correctas posibles
+- Formato: [multiple-choice options="opción1|opción2|opción3" correctOptions="opciónCorrecta1|opciónCorrecta2"][/multiple-choice]
+- Ejemplo: [multiple-choice options="Lechuga|Manzana|Zanahoria|Plátano|Pera" correctOptions="Manzana|Plátano|Pera"][/multiple-choice]
+
+### 3. single-choice
+- Usar para: Preguntas con UNA SOLA respuesta correcta
+- Formato: [single-choice options="opción1|opción2|opción3" correctOption="opciónCorrecta"][/single-choice]
+- Ejemplo: [single-choice options="Rojo|Verde|Azul|Amarillo" correctOption="Azul"][/single-choice]
+
+### 4. fill-in-the-blanks
+- Usar para: Textos con espacios para rellenar (texto libre)
+- Formato: [fill-in-the-blanks text="Texto con [text|respuesta] para completar." casesensitive="false" specialcharssensitive="false"][/fill-in-the-blanks]
+- Ejemplo: [fill-in-the-blanks text="La capital de [text|España] es Madrid." casesensitive="false" specialcharssensitive="false"][/fill-in-the-blanks]
+
+### 5. fill-in-the-blanks
+- Usar para: Elegir entre dos opciones
+- Formato: [fill-in-the-blanks text="Texto: [radio|Verdadero#Falso*]" casesensitive="false" specialcharssensitive="false"][/fill-in-the-blanks]
+- Ejemplo: [fill-in-the-blanks text="La leche es: [radio|Blanca*#Negra]" casesensitive="false" specialcharssensitive="false"][/fill-in-the-blanks]
+- MUY IMPORTANTE: El asterisco (*) indica la opción correcta. El símbolo | separa las opciones.
+
+### 6. fill-in-the-blanks
+- Usar para: Textos con espacios para seleccionar entre opciones (menú desplegable)
+- Formato: [fill-in-the-blanks text="Texto con [select|Incorrecta1#*Correcta#Incorrecta2] para seleccionar." casesensitive="false" specialcharssensitive="false"][/fill-in-the-blanks]
+- Ejemplo: [fill-in-the-blanks text="El animal más rápido es el [select|leopardo#*guepardo#león#tigre]." casesensitive="false" specialcharssensitive="false"][/fill-in-the-blanks]
+- MUY IMPORTANTE: El asterisco (*) indica la opción correcta. Debe haber solo una opción correcta por cada hueco. El símbolo # separa las opciones.
+
+### 7. fill-in-the-blanks
+- Usar para: Introducir letras letras para completar una única palabra
+- Formato: [fill-in-the-blanks text="Texto [short-text|letra1][short-text|letra2][short-text|letra3]" casesensitive="false" specialcharssensitive="false"][/fill-in-the-blanks]
+- Ejemplo: [fill-in-the-blanks text="El caballo [text|blanco] de Santiago es de [short-text|c][short-text|o][short-text|l][short-text|o][short-text|r] blanco." casesensitive="false" specialcharssensitive="false"][/fill-in-the-blanks]
+
+### 8. statement-option-match
+- Usar para: Emparejar conceptos o frases con sus correspondientes opciones
+- Formato: [statement-option-match statements="a*afirmación1|b*afirmación2" options="a*título1*descripción1|b*título2*descripción2"][/statement-option-match]
+- Ejemplo: [statement-option-match statements="a*Lorem ipsum|b*Ipsum lorem|c*Dolor sit" options="a*Persona 1*Lorem ipsum Lorem ipsum|b*Persona 2*Lorem ipsum Lorem ipsum|c*Persona 3*Lorem ipsum Lorem ipsum"][/statement-option-match]
+
+### 9. writing
+- Usar para: Producción libre de texto escrito
+- Formato: [writing maxtime="0"][/writing]
+- Ejemplo: [writing maxtime="0"][/writing]
+
+### 10. oral-expression
+- Usar para: Producción oral de respuestas
+- Formato: [oral-expression autoplay="false" maxtime="0" maxplays="0"][/oral-expression]
+- Ejemplo: [oral-expression autoplay="false" maxtime="0" maxplays="0"][/oral-expression]
+
+### 11. file-upload
+- Usar para: Subir archivos como respuesta
+- Formato: [file-upload extensions="pdf|doc|docx"][/file-upload]
+- Ejemplo: [file-upload extensions="pdf|doc|docx"][/file-upload]
+
+### 12. image-choice
+- Usar para: Preguntas con opciones de selección de imágenes
+- Formato: [image-choice images="url_imagen1*texto_alternativo1|url_imagen2*texto_alternativo2" correctOptionIndex="índice_opción_correcta"][/image-choice]
+- Ejemplo: [image-choice images="https://url-a-imagen-de-gato.com/gato.jpg*texto alternativo gato|https://url-a-imagen-de-perro.com/perro.jpg*texto alternativo perro" correctOptionIndex="1"][/image-choice]
+
+### 13. multi-question
+- Usar para: Agrupar varias preguntas en un solo bloque
+- Formato: [multi-question questions=""][/multi-question]
+- Ejemplo: [multi-question questions=""][/multi-question]
+
+### 14. abnone-choice
+- Usar para: Preguntas con opciones A, B, Ninguna de las anteriores
+- Formato: [abnone-choice titlea="Título A" texta="Texto A" titleb="Título B" textb="Texto B" questions="a*Pregunta A|b*Pregunta B|c*Pregunta C"][/abnone-choice]
+- Ejemplo: [abnone-choice titlea="Lorem" texta="Lorem ipsum Lorem ipsum" titleb="Ipsum" textb="Lorem" questions="a*¿Lorem ipsum?|b*¿Ipsum lorem?|c*¿Dolor sit?"]
+
+## Instrucciones IMPORTANTES
+
+1. Analiza cuidadosamente el tipo de ejercicio antes de elegir el shortcode
+2. Usa EXACTAMENTE la misma estructura y símbolos separadores (|, *, #, etc.) que se muestran en los ejemplos
+3. Respeta el formato exacto de las comillas y corchetes
+4. Si un ejercicio no encaja exactamente en un tipo, elige el más cercano y adáptalo
+5. Si un ejercicio tiene múltiples partes que requieren diferentes tipos, trátalas como actividades separadas
+6. Si un ejercicio tiene múltiples partes intenta que vaya en un ÚNICO shortcode
+7. Los shortcodes tipo fill-the-blanks pueden usarse para agrupar en un único shortcode varios apartados distintos. Pueden ser del mismo tipo o de diferente tipo:
+   – Ejemplo: [fill-in-the-blanks text="La capital de [text|España] es Madrid. El caballo [text|blanco] de Santiago es de [short-text|c][short-text|o][short-text|l][short-text|o][short-text|r] blanco. El animal más rápido del mundo es el [select|leopardo#*guepardo#león#tigre]. Las afirmaciones anteriores son: [radio|Verdaderas#Falsas*]" casesensitive="false" specialcharssensitive="false"][/fill-in-the-blanks]
+
+## Formato de tu respuesta
+
+Responde usando exactamente este formato:
+
+ENUNCIADO: (escribe aquí el enunciado principal identificado en el texto)
+
+ACTIVIDAD 1:
+- Texto original: (transcribe aquí el texto completo de la actividad como aparece en el texto)
+- Tipo de shortcode: (nombre exacto del tipo de shortcode más adecuado)
+- Shortcode generado: (escribe el shortcode completo siguiendo exactamente el formato del ejemplo)
+
+ACTIVIDAD 2:
+- Texto original: (texto de la segunda actividad)
+- Tipo de shortcode: (tipo elegido)
+- Shortcode generado: (shortcode completo)
+
+Y así sucesivamente para cada actividad identificada.
+
+NO uses formato JSON ni otro formato. Usa SOLO el formato de texto indicado.
+"""
+    
+    # Estructura de la solicitud
+    data = {
+        "model": "claude-3-7-sonnet-20250219",
+        "max_tokens": 4000,
+        "messages": [
+            {
+                "role": "user",
+                "content": [
+                    {
+                        "type": "text",
+                        "text": instrucciones_completas + "\n\nAquí está el texto a analizar:\n\n" + texto
+                    }
+                ]
+            }
+        ]
+    }
+    
+    try:
+        # Realizar la solicitud a la API
+        response = requests.post(url, headers=headers, json=data, timeout=60)
+        
+        # Verificar si la respuesta fue exitosa
+        if response.status_code == 200:
+            try:
+                resultado = response.json()
+                
+                # Extraer la respuesta de texto
+                if 'content' in resultado and len(resultado['content']) > 0:
+                    respuesta_texto = resultado['content'][0]['text']
+                    return respuesta_texto
+                else:
+                    st.error("La respuesta de Claude no contiene contenido de texto")
+                    return None
+            except Exception as e:
+                st.error(f"Error al procesar la respuesta: {str(e)}")
+                return None
+        else:
+            # Mostrar información sobre el error
+            st.error(f"Error en la API: Código {response.status_code}")
+            try:
+                error_detail = response.json()
+            except:
+                error_detail = response.text
+            st.error(f"Detalle del error: {error_detail}")
+            return None
+    
+    except Exception as e:
+        st.error(f"Error al comunicarse con la API: {str(e)}")
+        return None
 
 # Función para analizar la imagen con prompt mejorado y personalizado
 def analizar_imagen_con_prompt(api_key, image_url, prompt_personalizado=""):
@@ -316,8 +510,8 @@ El shortcode debe seguir alguno de estos formatos:
 - drag-words: [drag-words words="palabra1|palabra2|palabra3" sentence="Texto con [] para rellenar" markers="palabra_correcta1|palabra_correcta2"][/drag-words]
 - multiple-choice: [multiple-choice options="opción1|opción2|opción3" correctOptions="opciónCorrecta1|opciónCorrecta2"][/multiple-choice]
 - single-choice: [single-choice options="opción1|opción2|opción3" correctOption="opciónCorrecta"][/single-choice]
-- fill-in-the-blanks: [fill-in-the-blanks text="Texto con [text|respuesta] para completar." casesensitive="false" specialcharssensitive="false"][/fill-in-the-blanks]
-- fill-in-the-blanks: [fill-in-the-blanks text="Texto con [select|Incorrecta1#*Correcta#Incorrecta2 casesensitive="false" specialcharssensitive="false"] para seleccionar."][/fill-in-the-blanks]
+- fill-in-the-blanks: [fill-in-the-blanks text="Texto con [text|respuesta] para completar."][/fill-in-the-blanks]
+- fill-in-the-blanks: [fill-in-the-blanks text="Texto con [select|Incorrecta1#*Correcta#Incorrecta2] para seleccionar."][/fill-in-the-blanks]
 – fill-in-the-blanks: [fill-in-the-blanks text="Texto [short-text|letra1][short-text|letra2][short-text|letra3]" casesensitive="false" specialcharssensitive="false"][/fill-in-the-blanks]
 – fill-in-the-blanks: [fill-in-the-blanks text="Texto: [radio|Verdadero#Falso*]" casesensitive="false" specialcharssensitive="false"][/fill-in-the-blanks]
 - statement-option-match: [statement-option-match statements="a*afirmación1|b*afirmación2" options="a*título1*descripción1|b*título2*descripción2"][/statement-option-match]
@@ -508,7 +702,7 @@ def guardar_version_shortcode(actividad_num, shortcode, explicacion=None):
 
 # Configuración de la app
 st.title("🔄 Conversor de Ejercicios a Shortcodes")
-st.markdown("### Extracción automática de ejercicios desde imágenes")
+st.markdown("### Extracción automática de ejercicios desde imágenes y texto plano")
 
 # Sidebar para configuración y historial
 with st.sidebar:
@@ -540,6 +734,9 @@ with st.sidebar:
             st.session_state.conversation_history = []
             st.session_state.shortcode_versions = {}
             st.session_state.current_image_url = None
+            st.session_state.current_pdf_page_images = []
+            st.session_state.current_pdf_page_index = 0
+            st.session_state.input_type = "image_url"
             st.session_state.prompt_personalizado = ""
             st.session_state.api_key_saved = ""
             st.session_state.session_id = str(int(time.time()))
@@ -576,18 +773,96 @@ if mostrar_tipologias:
             st.markdown(f"**{tipo['label']} ({tipo['name']})**")
             st.code(tipo['sample'], language="html")
 
+# Selector de tipo de entrada
+input_type_options = ["URL de imagen", "Texto plano"]
+input_type_mapping = {
+    "URL de imagen": "image_url", 
+    "Texto plano": "text_upload"
+}
+reverse_mapping = {v: k for k, v in input_type_mapping.items()}
+
+selected_input_type = st.radio(
+    "Selecciona el tipo de entrada:",
+    input_type_options,
+    index=input_type_options.index(reverse_mapping.get(st.session_state.input_type, "URL de imagen"))
+)
+
+# Actualizar el tipo de entrada en la sesión
+st.session_state.input_type = input_type_mapping[selected_input_type]
+
 # Área principal
 col1, col2 = st.columns([1, 1])
 
 with col1:
-    st.header("Proporciona la URL de la imagen")
-    url_imagen = st.text_input(
-        "URL de la imagen", 
-        "",
-        help="URL pública de la imagen de ejercicios"
-    )
+    # Interfaz diferente según el tipo de entrada seleccionado
+    if st.session_state.input_type == "image_url":
+        st.header("Proporciona la URL de la imagen")
+        url_imagen = st.text_input(
+            "URL de la imagen", 
+            "",
+            help="URL pública de la imagen de ejercicios"
+        )
+        
+        # Previsualizar la imagen (con manejo simple)
+        if url_imagen:
+            try:
+                # Verificar si la URL es accesible antes de mostrarla
+                response = requests.head(url_imagen, timeout=5)
+                if response.status_code == 200:
+                    st.image(url_imagen, caption="Imagen actual", use_container_width=True)
+                else:
+                    st.warning(f"⚠️ No se puede acceder a la imagen en la URL proporcionada. Código de estado: {response.status_code}")
+            except Exception as e:
+                st.warning(f"⚠️ No se ha podido acceder a la imagen en la URL proporcionada. Error: {str(e)}")
+        elif 'current_image_url' in st.session_state and st.session_state.current_image_url:
+            try:
+                # Verificar si la URL guardada es accesible
+                response = requests.head(st.session_state.current_image_url, timeout=5)
+                if response.status_code == 200:
+                    st.image(st.session_state.current_image_url, caption="Imagen procesada", use_container_width=True)
+                else:
+                    st.warning(f"⚠️ No se puede acceder a la imagen guardada. Código de estado: {response.status_code}")
+            except Exception as e:
+                st.warning(f"⚠️ No se ha podido acceder a la imagen guardada. Error: {str(e)}")
     
-    # Campo para prompt personalizado con clave dinámica
+    else:  # text_upload
+        st.header("Texto de los ejercicios")
+        # Opción para subir un archivo de texto
+        uploaded_text_file = st.file_uploader("Sube un archivo de texto (opcional)", type=["txt"])
+        
+        # Si se subió un archivo de texto, leerlo
+        if uploaded_text_file is not None:
+            # Verificar si es un nuevo archivo de texto
+            text_contents = uploaded_text_file.getvalue().decode("utf-8")
+            text_hash = hash(text_contents)
+            
+            is_new_text = ('current_text_hash' not in st.session_state or 
+                           st.session_state.get('current_text_hash') != text_hash)
+            
+            if is_new_text:
+                # Es un nuevo archivo de texto
+                st.session_state.current_text_hash = text_hash
+                st.session_state.current_text_content = text_contents
+                
+                # Registrar en el historial
+                agregar_a_historial(
+                    "Nuevo archivo de texto subido", 
+                    f"Nombre: {uploaded_text_file.name}\nTamaño: {len(text_contents)} caracteres"
+                )
+        
+        # Área de texto para editar o pegar directamente
+        text_content = st.text_area(
+            "O introduce el texto directamente aquí",
+            value=st.session_state.current_text_content,
+            height=300,
+            help="Pega el texto de los ejercicios o edita el contenido del archivo subido"
+        )
+        
+        # Actualizar el texto en la sesión si cambió
+        if text_content != st.session_state.current_text_content:
+            st.session_state.current_text_content = text_content
+    
+    # Campo para prompt personalizado (común para ambos tipos)
     st.header("Instrucciones personalizadas (opcional)")
     prompt_personalizado = st.text_area(
         "Añade instrucciones adicionales para Claude",
@@ -600,104 +875,80 @@ with col1:
     if prompt_personalizado != st.session_state.prompt_personalizado:
         st.session_state.prompt_personalizado = prompt_personalizado
     
-    # Previsualizar la imagen (con manejo simple)
-    if url_imagen:
-        try:
-            # Verificar si la URL es accesible antes de mostrarla
-            response = requests.head(url_imagen, timeout=5)
-            if response.status_code == 200:
-                st.image(url_imagen, caption="Imagen actual", use_container_width=True)
-            else:
-                st.warning(f"⚠️ No se puede acceder a la imagen en la URL proporcionada. Código de estado: {response.status_code}")
-        except Exception as e:
-            st.warning(f"⚠️ No se ha podido acceder a la imagen en la URL proporcionada. Error: {str(e)}")
-    elif 'current_image_url' in st.session_state and st.session_state.current_image_url:
-        try:
-            # Verificar si la URL guardada es accesible
-            response = requests.head(st.session_state.current_image_url, timeout=5)
-            if response.status_code == 200:
-                st.image(st.session_state.current_image_url, caption="Imagen procesada", use_container_width=True)
-            else:
-                st.warning(f"⚠️ No se puede acceder a la imagen guardada. Código de estado: {response.status_code}")
-        except Exception as e:
-            st.warning(f"⚠️ No se ha podido acceder a la imagen guardada. Error: {str(e)}")
-    
     # Botón de procesamiento
-    if st.button("Procesar imagen", type="primary"):
+    if st.button("Procesar", type="primary"):
         if not api_key:
             st.error("Por favor, ingresa tu clave API de Anthropic en la barra lateral.")
-        elif not url_imagen:
+        elif st.session_state.input_type == "image_url" and not url_imagen:
             st.error("Por favor, proporciona una URL de imagen válida.")
+        elif st.session_state.input_type == "text_upload" and not st.session_state.current_text_content.strip():
+            st.error("Por favor, introduce o sube un texto para procesar.")
         else:
-            # Verificar si es una nueva imagen o la misma
-            is_new_image = 'current_image_url' not in st.session_state or st.session_state.current_image_url != url_imagen
+            # Limpiar variables específicas para un nuevo procesamiento
+            for key in ['texto_respuesta', 'resultado', 'shortcode_versions']:
+                if key in st.session_state:
+                    del st.session_state[key]
             
-            if is_new_image:
-                # Es una nueva imagen, reiniciar estado pero conservar algunos datos
+            # Procesar según el tipo de entrada
+            if st.session_state.input_type == "image_url":
+                # Verificar si es una nueva imagen o la misma
+                is_new_image = 'current_image_url' not in st.session_state or st.session_state.current_image_url != url_imagen
                 
-                # Solo conservar la API key y prompt personalizado
-                api_key_temp = api_key
-                prompt_temp = prompt_personalizado
+                if is_new_image:
+                    # Guardar mensaje para el historial
+                    old_url = st.session_state.get('current_image_url', 'Ninguna')
+                    mensaje_cambio = f"URL anterior: {old_url}\nNueva URL: {url_imagen}"
+                    
+                    # Actualizar la URL actual
+                    st.session_state.current_image_url = url_imagen
+                    
+                    # Registrar el cambio en el historial
+                    agregar_a_historial("Cambio de imagen", mensaje_cambio)
                 
-                # Guardar mensaje para el historial
-                old_url = st.session_state.get('current_image_url', 'Ninguna')
-                mensaje_cambio = f"URL anterior: {old_url}\nNueva URL: {url_imagen}"
-                
-                # Regenerar session_id para forzar nuevos widgets
-                new_session_id = str(int(time.time()))
-                
-                # Reinicio parcial (conservando historial)
-                conversation_history_temp = st.session_state.conversation_history.copy() if 'conversation_history' in st.session_state else []
-                
-                # Limpiar variables específicas
-                for key in ['texto_respuesta', 'resultado', 'shortcode_versions']:
-                    if key in st.session_state:
-                        del st.session_state[key]
-                
-                # Restaurar y configurar variables esenciales
-                st.session_state.api_key_saved = api_key_temp
-                st.session_state.prompt_personalizado = prompt_temp
-                st.session_state.current_image_url = url_imagen
-                st.session_state.conversation_history = conversation_history_temp
-                st.session_state.shortcode_versions = {}
-                st.session_state.session_id = new_session_id
-                
-                # Registrar el cambio en el historial
-                agregar_a_historial("Cambio de imagen", mensaje_cambio)
+                # Procesar la imagen desde la URL
+                with st.spinner("Analizando la imagen..."):
+                    texto_respuesta = analizar_imagen_con_prompt(api_key, url_imagen, prompt_personalizado)
+                    
+                    if texto_respuesta:
+                        evento = "Imagen procesada"
+                        detalles = f"URL: {url_imagen}"
+                        if prompt_personalizado:
+                            detalles += f"\nPrompt personalizado: {prompt_personalizado}"
+                        
+                        agregar_a_historial(evento, detalles)
             
-            # Procesar la imagen (tanto para nuevas como existentes)
-            with st.spinner("Analizando la imagen..."):
-                texto_respuesta = analizar_imagen_con_prompt(api_key, url_imagen, prompt_personalizado)
+            else:  # text_upload
+                # Procesar el texto directamente
+                with st.spinner("Analizando el texto..."):
+                    texto_respuesta = analizar_texto_con_prompt(api_key, st.session_state.current_text_content, prompt_personalizado)
+                    
+                    if texto_respuesta:
+                        evento = "Texto procesado"
+                        detalles = f"Longitud: {len(st.session_state.current_text_content)} caracteres"
+                        if prompt_personalizado:
+                            detalles += f"\nPrompt personalizado: {prompt_personalizado}"
+                        
+                        agregar_a_historial(evento, detalles)
+            
+            # Procesar el resultado (común para todos los tipos de entrada)
+            if texto_respuesta:
+                # Guardar el texto completo
+                st.session_state.texto_respuesta = texto_respuesta
                 
-                if texto_respuesta:
-                    # Guardar el texto completo
-                    st.session_state.texto_respuesta = texto_respuesta
-                    
-                    # Extraer información estructurada
-                    info_estructurada = extraer_informacion_texto(texto_respuesta)
-                    st.session_state.resultado = info_estructurada
-                    
-                    # Guardar la versión inicial de cada shortcode
-                    for actividad in info_estructurada.get("actividades", []):
-                        guardar_version_shortcode(
-                            actividad.get("numero"), 
-                            actividad.get("shortcode")
-                        )
-                    
-                    # Agregar al historial - mensaje diferente según si es nueva o existente
-                    if is_new_image:
-                        evento = "Nueva imagen procesada"
-                    else:
-                        evento = "Imagen reprocesada"
-                    
-                    agregar_a_historial(
-                        evento, 
-                        f"URL: {url_imagen}\nPrompt personalizado: {prompt_personalizado if prompt_personalizado else 'Ninguno'}"
+                # Extraer información estructurada
+                info_estructurada = extraer_informacion_texto(texto_respuesta)
+                st.session_state.resultado = info_estructurada
+                
+                # Guardar la versión inicial de cada shortcode
+                for actividad in info_estructurada.get("actividades", []):
+                    guardar_version_shortcode(
+                        actividad.get("numero"), 
+                        actividad.get("shortcode")
                     )
-                    
-                    # Mostrar mensaje de éxito
-                    st.success("¡Análisis completado!")
-                    st.rerun()  # Recargar para actualizar la interfaz
+                
+                # Mostrar mensaje de éxito
+                st.success("¡Análisis completado!")
+                st.rerun()  # Recargar para actualizar la interfaz
 
 with col2:
     st.header("Resultado")
@@ -855,7 +1106,7 @@ with col2:
             with st.expander("Vista previa del archivo de descarga"):
                 st.text(texto_descargable)
     else:
-        st.info("Procesa una imagen para ver los resultados.")
+        st.info("Procesa una imagen o PDF para ver los resultados.")
 
 # Footer
 st.markdown("---")
