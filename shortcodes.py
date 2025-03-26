@@ -167,7 +167,7 @@ Debes convertir cada actividad al formato de shortcode más apropiado según los
 - Usar para: Textos con espacios para seleccionar entre opciones (menú desplegable)
 - Formato: [fill-in-the-blanks text="Texto con [select|Incorrecta1#*Correcta#Incorrecta2] para seleccionar." casesensitive="false" specialcharssensitive="false"][/fill-in-the-blanks]
 - Ejemplo: [fill-in-the-blanks text="El animal más rápido es el [select|leopardo#*guepardo#león#tigre]." casesensitive="false" specialcharssensitive="false"][/fill-in-the-blanks]
-- MUY IMPORTANTE: El asterisco (*) indica la opción correcta. Debe haber solo una opción correcta por cada hueco. El símbolo # separa las opciones.
+- MUY IMPORTANTE: El asterisco (*) indica la opción correcta. Debe haber solo una opción correcta por cada hueco. El símbolo # separa las opciones. SIEMPRE hay que poner la oción correcta.
 
 ### 7. fill-in-the-blanks
 - Usar para: Introducir letras letras para completar una única palabra
