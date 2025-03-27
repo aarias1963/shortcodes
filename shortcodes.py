@@ -159,8 +159,8 @@ Debes convertir cada actividad al formato de shortcode más apropiado según los
 
 ### 5. fill-in-the-blanks
 - Usar para: Elegir entre dos opciones
-- Formato: [fill-in-the-blanks text="Texto: [radio|Verdadero#Falso*]" casesensitive="false" specialcharssensitive="false"][/fill-in-the-blanks]
-- Ejemplo: [fill-in-the-blanks text="La leche es: [radio|Blanca*#Negra]" casesensitive="false" specialcharssensitive="false"][/fill-in-the-blanks]
+- Formato: [fill-in-the-blanks text="Texto: [radio|Verdadero#*Falso]" casesensitive="false" specialcharssensitive="false"][/fill-in-the-blanks]
+- Ejemplo: [fill-in-the-blanks text="La leche es: [radio|*Blanca#Negra]" casesensitive="false" specialcharssensitive="false"][/fill-in-the-blanks]
 - MUY IMPORTANTE: El asterisco (*) indica la opción correcta. El símbolo | separa las opciones.
 
 ### 6. fill-in-the-blanks
@@ -218,7 +218,7 @@ Debes convertir cada actividad al formato de shortcode más apropiado según los
 5. Si un ejercicio tiene múltiples partes que requieren diferentes tipos, trátalas como actividades separadas
 6. Si un ejercicio tiene múltiples partes intenta que vaya en un ÚNICO shortcode
 7. Los shortcodes tipo fill-the-blanks pueden usarse para agrupar en un único shortcode varios apartados distintos. Pueden ser del mismo tipo o de diferente tipo:
-   – Ejemplo: [fill-in-the-blanks text="La capital de [text|España] es Madrid. El caballo [text|blanco] de Santiago es de [short-text|c][short-text|o][short-text|l][short-text|o][short-text|r] blanco. El animal más rápido del mundo es el [select|leopardo#*guepardo#león#tigre]. Las afirmaciones anteriores son: [radio|Verdaderas#Falsas*]" casesensitive="false" specialcharssensitive="false"][/fill-in-the-blanks]
+   – Ejemplo: [fill-in-the-blanks text="La capital de [text|España] es Madrid. El caballo [text|blanco] de Santiago es de [short-text|c][short-text|o][short-text|l][short-text|o][short-text|r] blanco. El animal más rápido del mundo es el [select|leopardo#*guepardo#león#tigre]. Las afirmaciones anteriores son: [radio|Verdaderas#*Falsas]" casesensitive="false" specialcharssensitive="false"][/fill-in-the-blanks]
 
 ## Formato de tu respuesta
 
@@ -337,8 +337,8 @@ Debes convertir cada actividad al formato de shortcode más apropiado según los
 
 ### 5. fill-in-the-blanks
 - Usar para: Elegir entre dos opciones
-- Formato: [fill-in-the-blanks text="Texto: [radio|Verdadero#Falso*]" casesensitive="false" specialcharssensitive="false"][/fill-in-the-blanks]
-- Ejemplo: [fill-in-the-blanks text="La leche es: [radio|Blanca*#Negra]" casesensitive="false" specialcharssensitive="false"][/fill-in-the-blanks]
+- Formato: [fill-in-the-blanks text="Texto: [radio|Verdadero#*Falso]" casesensitive="false" specialcharssensitive="false"][/fill-in-the-blanks]
+- Ejemplo: [fill-in-the-blanks text="La leche es: [radio|*Blanca#Negra]" casesensitive="false" specialcharssensitive="false"][/fill-in-the-blanks]
 - MUY IMPORTANTE: El asterisco (*) indica la opción correcta. El símbolo | separa las opciones.
 
 ### 6. fill-in-the-blanks
