@@ -176,8 +176,9 @@ Debes convertir cada actividad al formato de shortcode más apropiado según los
 
 ### 8. statement-option-match
 - Usar para: Emparejar conceptos o frases con sus correspondientes opciones
-- Formato: [statement-option-match statements="a*afirmación1|b*afirmación2" options="a*título1*descripción1|b*título2*descripción2"][/statement-option-match]
-- Ejemplo: [statement-option-match statements="a*Lorem ipsum|b*Ipsum lorem|c*Dolor sit" options="a*Persona 1*Lorem ipsum Lorem ipsum|b*Persona 2*Lorem ipsum Lorem ipsum|c*Persona 3*Lorem ipsum Lorem ipsum"][/statement-option-match]
+- Formato: [statement-option-match statements="a*afirmación1|b*afirmación2" options="b*respuesta correcta para la afirmación2*descripción1 (puede no existir, si no existe no poner nada)|a*respuesta correcta para la afirmación2*descripción2 (puede no existir, si no existe no poner nada)"][/statement-option-match]
+- Ejemplo: [statement-option-match statements="a*La leche es|b*El cielo es|c*La hierba es" options="b*azul*El  mismo color que el mar|b*verde*|a*blanca*"][/statement-option-match]
+- MUY IMPORTANTE: Poner la misma etiqueta (números o letras) tanto en los statments como en las options. En las options las etiquetas indican la respuesta correcta para la opción. En las options, si no hay descripción mantener los dos asteríscos.
 
 ### 9. writing
 - Usar para: Producción libre de texto escrito
@@ -353,9 +354,10 @@ Debes convertir cada actividad al formato de shortcode más apropiado según los
 - Ejemplo: [fill-in-the-blanks text="El caballo [text|blanco] de Santiago es de [short-text|c][short-text|o][short-text|l][short-text|o][short-text|r] blanco." casesensitive="false" specialcharssensitive="false"][/fill-in-the-blanks]
 
 ### 8. statement-option-match
-- Usar para: Emparejar conceptos o frases con sus correspondientes opciones
-- Formato: [statement-option-match statements="a*afirmación1|b*afirmación2" options="a*título1*descripción1|b*título2*descripción2"][/statement-option-match]
-- Ejemplo: [statement-option-match statements="a*Lorem ipsum|b*Ipsum lorem|c*Dolor sit" options="a*Persona 1*Lorem ipsum Lorem ipsum|b*Persona 2*Lorem ipsum Lorem ipsum|c*Persona 3*Lorem ipsum Lorem ipsum"][/statement-option-match]
+- Usar para: Emparejar conceptos o frases con sus correspondientes opciones correctas
+- Formato: [statement-option-match statements="a*afirmación1|b*afirmación2" options="b*respuesta correcta para la afirmación2*descripción1 (puede no existir, si no existe no poner nada)|a*respuesta correcta para la afirmación2*descripción2 (puede no existir, si no existe no poner nada)"][/statement-option-match]
+- Ejemplo: [statement-option-match statements="a*La leche es|b*El cielo es|c*La hierba es" options="b*azul*El  mismo color que el mar|b*verde*|a*blanca*"][/statement-option-match]
+- MUY IMPORTANTE: Poner la misma etiqueta (números o letras) tanto en los statments como en las options. En las options las etiquetas indican la respuesta correcta para la opción. En las options, si no hay descripción mantener los dos asteríscos.
 
 ### 9. writing
 - Usar para: Producción libre de texto escrito
@@ -519,7 +521,7 @@ El shortcode debe seguir alguno de estos formatos:
 - fill-in-the-blanks: [fill-in-the-blanks text="Texto con [select|Incorrecta1#*Correcta#Incorrecta2 casesensitive="false" specialcharssensitive="false"] para seleccionar."][/fill-in-the-blanks]
 - fill-in-the-blanks: [fill-in-the-blanks text="Texto [short-text|letra1][short-text|letra2][short-text|letra3]" casesensitive="false" specialcharssensitive="false"][/fill-in-the-blanks]
 - fill-in-the-blanks: [fill-in-the-blanks text="Texto: [radio|Verdadero#Falso*]" casesensitive="false" specialcharssensitive="false"][/fill-in-the-blanks]
-- statement-option-match: [statement-option-match statements="a*afirmación1|b*afirmación2" options="a*título1*descripción1|b*título2*descripción2"][/statement-option-match]
+- statement-option-match: [statement-option-match statements="a*afirmación1|b*afirmación2" options="b*respuesta correcta para la afirmación2*descripción1 (puede no existir, si no existe no poner nada)|a*respuesta correcta para la afirmación2*descripción2 (puede no existir, si no existe no poner nada)"][/statement-option-match]
 - writing: [writing maxtime="0"][/writing]
 - oral-expression: [oral-expression autoplay="false" maxtime="0" maxplays="0"][/oral-expression]
 - file-upload: [file-upload extensions="pdf|doc|docx"][/file-upload]
