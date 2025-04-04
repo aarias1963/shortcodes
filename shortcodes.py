@@ -170,7 +170,7 @@ Debes convertir cada actividad al formato de shortcode más apropiado según los
 - MUY IMPORTANTE: El asterisco (*) indica la opción correcta. Debe haber solo una opción correcta por cada hueco. El símbolo # separa las opciones. SIEMPRE hay que poner la oción correcta.
 
 ### 7. fill-in-the-blanks
-- Usar para: Introducir letras letras para completar una única palabra
+- Usar para: Introducir letras para completar una única palabra
 - Formato: [fill-in-the-blanks text="Texto [short-text|letra1][short-text|letra2][short-text|letra3]" casesensitive="false" specialcharssensitive="false"][/fill-in-the-blanks]
 - Ejemplo: [fill-in-the-blanks text="El caballo [text|blanco] de Santiago es de [short-text|c][short-text|o][short-text|l][short-text|o][short-text|r] blanco." casesensitive="false" specialcharssensitive="false"][/fill-in-the-blanks]
 
@@ -349,7 +349,7 @@ Debes convertir cada actividad al formato de shortcode más apropiado según los
 - MUY IMPORTANTE: El asterisco (*) indica la opción correcta. Debe haber solo una opción correcta por cada hueco. El símbolo # separa las opciones.
 
 ### 7. fill-in-the-blanks
-- Usar para: Introducir letras letras para completar una única palabra
+- Usar para: Introducir letras para completar una única palabra
 - Formato: [fill-in-the-blanks text="Texto [short-text|letra1][short-text|letra2][short-text|letra3]" casesensitive="false" specialcharssensitive="false"][/fill-in-the-blanks]
 - Ejemplo: [fill-in-the-blanks text="El caballo [text|blanco] de Santiago es de [short-text|c][short-text|o][short-text|l][short-text|o][short-text|r] blanco." casesensitive="false" specialcharssensitive="false"][/fill-in-the-blanks]
 
