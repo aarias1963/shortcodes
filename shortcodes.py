@@ -335,12 +335,13 @@ Debes convertir cada actividad al formato de shortcode más apropiado según los
 - Usar para: Textos con espacios para rellenar (texto libre)
 - Formato: [fill-in-the-blanks text="Texto con [text|respuesta] para completar." casesensitive="false" specialcharssensitive="false"][/fill-in-the-blanks]
 - Ejemplo: [fill-in-the-blanks text="La capital de [text|España] es Madrid." casesensitive="false" specialcharssensitive="false"][/fill-in-the-blanks]
+- MUY IMPORTANTE: Si hay varias respuestas válidas se deben separar con el símbolo almohadilla (#).
 
 ### 5. fill-in-the-blanks
 - Usar para: Elegir entre dos opciones
 - Formato: [fill-in-the-blanks text="Texto: [radio|Verdadero#*Falso]" casesensitive="false" specialcharssensitive="false"][/fill-in-the-blanks]
 - Ejemplo: [fill-in-the-blanks text="La leche es: [radio|*Blanca#Negra]" casesensitive="false" specialcharssensitive="false"][/fill-in-the-blanks]
-- MUY IMPORTANTE: El asterisco (*) indica la opción correcta. El símbolo | separa las opciones.
+- MUY IMPORTANTE: El asterisco (*) indica la opción correcta. El símbolo | separa las opciones. 
 
 ### 6. fill-in-the-blanks
 - Usar para: Textos con espacios para seleccionar entre opciones (menú desplegable)
@@ -518,6 +519,7 @@ El shortcode debe seguir alguno de estos formatos:
 - multiple-choice: [multiple-choice options="opción1|opción2|opción3" correctOptions="opciónCorrecta1|opciónCorrecta2"][/multiple-choice]
 - single-choice: [single-choice options="opción1|opción2|opción3" correctOption="opciónCorrecta"][/single-choice]
 - fill-in-the-blanks: [fill-in-the-blanks text="Texto con [text|respuesta] para completar." casesensitive="false" specialcharssensitive="false"][/fill-in-the-blanks]
+- fill-in-the-blanks: [fill-in-the-blanks text="Texto con [text|respuesta_valida1#respuesta_valida2] para completar." casesensitive="false" specialcharssensitive="false"][/fill-in-the-blanks]
 - fill-in-the-blanks: [fill-in-the-blanks text="Texto con [select|Incorrecta1#*Correcta#Incorrecta2 casesensitive="false" specialcharssensitive="false"] para seleccionar."][/fill-in-the-blanks]
 - fill-in-the-blanks: [fill-in-the-blanks text="Texto [short-text|letra1][short-text|letra2][short-text|letra3]" casesensitive="false" specialcharssensitive="false"][/fill-in-the-blanks]
 - fill-in-the-blanks: [fill-in-the-blanks text="Texto: [radio|Verdadero#Falso*]" casesensitive="false" specialcharssensitive="false"][/fill-in-the-blanks]
