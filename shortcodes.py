@@ -156,6 +156,7 @@ Debes convertir cada actividad al formato de shortcode más apropiado según los
 - Usar para: Textos con espacios para rellenar (texto libre)
 - Formato: [fill-in-the-blanks text="Texto con [text|respuesta] para completar." casesensitive="false" specialcharssensitive="false"][/fill-in-the-blanks]
 - Ejemplo: [fill-in-the-blanks text="La capital de [text|España] es Madrid." casesensitive="false" specialcharssensitive="false"][/fill-in-the-blanks]
+- MUY IMPORTANTE: Si hay varias respuestas válidas se deben separar con el símbolo almohadilla (#).
 
 ### 5. fill-in-the-blanks
 - Usar para: Elegir entre dos opciones
