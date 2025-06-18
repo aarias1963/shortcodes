@@ -10,7 +10,7 @@ from typing import Dict, List, Optional, Any
 
 # Configuración de la página
 st.set_page_config(
-    page_title="Conversor de Ejercicios a Shortcodes + EdiBlocks",
+    page_title="Conversor de Ejercicios a Shortcodes",
     page_icon="📚",
     layout="wide"
 )
