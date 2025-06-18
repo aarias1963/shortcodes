@@ -63,7 +63,7 @@ TIPOLOGIAS = [
     {
         "name": "oral-expression",
         "label": "Expresión Oral",
-        "sample": "[oral-expression autoplay=\"false\" maxtime=\"0\" maxplays=\"0\"][/oral-expression]"
+        "sample": "[oral-expression autoplay="false" maxtime="0" maxplays="0" recordmode="audio"][/oral-expression]"
     },
     {
         "name": "file-upload",
@@ -797,8 +797,8 @@ Debes convertir cada actividad al formato de shortcode más apropiado según los
 
 ### 10. oral-expression
 - Usar para: Producción oral de respuestas
-- Formato: [oral-expression autoplay="false" maxtime="0" maxplays="0"][/oral-expression]
-- Ejemplo: [oral-expression autoplay="false" maxtime="0" maxplays="0"][/oral-expression]
+- Formato: [oral-expression autoplay="false" maxtime="0" maxplays="0" recordmode="audio"][/oral-expression]
+- Ejemplo: [oral-expression autoplay="false" maxtime="0" maxplays="0" recordmode="audio"][/oral-expression]
 
 ### 11. file-upload
 - Usar para: Subir archivos como respuesta
@@ -977,8 +977,8 @@ Debes convertir cada actividad al formato de shortcode más apropiado según los
 
 ### 10. oral-expression
 - Usar para: Producción oral de respuestas
-- Formato: [oral-expression autoplay="false" maxtime="0" maxplays="0"][/oral-expression]
-- Ejemplo: [oral-expression autoplay="false" maxtime="0" maxplays="0"][/oral-expression]
+- Formato: [oral-expression autoplay="false" maxtime="0" maxplays="0" recordmode="audio"][/oral-expression]
+- Ejemplo: [oral-expression autoplay="false" maxtime="0" maxplays="0" recordmode="audio"][/oral-expression]
 
 ### 11. file-upload
 - Usar para: Subir archivos como respuesta
@@ -1135,7 +1135,7 @@ El shortcode debe seguir alguno de estos formatos:
 - fill-in-the-blanks: [fill-in-the-blanks text="Texto: [radio|Verdadero#Falso*]" casesensitive="false" specialcharssensitive="false"][/fill-in-the-blanks]
 - statement-option-match: [statement-option-match statements="a*afirmación1|b*afirmación2" options="b*respuesta correcta para la afirmación2*descripción1 (puede no existir, si no existe no poner nada)|a*respuesta correcta para la afirmación2*descripción2 (puede no existir, si no existe no poner nada)"][/statement-option-match]
 - writing: [writing maxtime="0"][/writing]
-- oral-expression: [oral-expression autoplay="false" maxtime="0" maxplays="0"][/oral-expression]
+- oral-expression: [oral-expression autoplay="false" maxtime="0" maxplays="0" recordmode="audio"][/oral-expression]
 - file-upload: [file-upload extensions="pdf|doc|docx"][/file-upload]
 - image-choice: [image-choice images="url_imagen1*texto_alternativo1|url_imagen2*texto_alternativo2" correctOptionIndex="índice_opción_correcta"][/image-choice]
 - multi-question: [multi-question questions=""][/multi-question]
