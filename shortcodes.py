@@ -63,7 +63,7 @@ TIPOLOGIAS = [
     {
         "name": "oral-expression",
         "label": "Expresión Oral",
-        "sample": "[oral-expression autoplay="false" maxtime="0" maxplays="0" recordmode="audio"][/oral-expression]"
+        "sample": "[oral-expression autoplay=\"false\" maxtime=\"0\" maxplays=\"0\" recordmode=\"audio\"][/oral-expression]"
     },
     {
         "name": "file-upload",
